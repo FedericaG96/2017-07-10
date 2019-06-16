@@ -1,38 +1,29 @@
 package it.polito.tdp.artsmia.db;
 
 import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.SQLException;
 
-import javax.sql.DataSource;
-
-import com.mchange.v2.c3p0.DataSources;
+import com.zaxxer.hikari.HikariDataSource;
 
 public class DBConnect {
 
-	private static String jdbcURL = "jdbc:mysql://localhost/artsmia?user=root";
+	private static String jdbcURL = "jdbc:mysql://localhost/artsmia?useTimezone=true&serverTimezone=UTC&user=root&password=Federi22!";
 
-	private static DataSource ds;
+	static private Connection connection = null;
 
 	public static Connection getConnection() {
 
-		if (ds == null) {
-			// initialize DataSource
-			try {
-				ds = DataSources.pooledDataSource(DataSources.unpooledDataSource(jdbcURL));
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-				System.exit(1);
-			}
-		}
-
 		try {
-			Connection c = ds.getConnection();
-			return c;
+			if (connection == null || connection.isClosed()) {
+				connection = DriverManager.getConnection(jdbcURL);
+			}
+			return connection;
+
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
+
 			e.printStackTrace();
-			return null;
+			throw new RuntimeException("Cannot get a connection " + jdbcURL, e);
 		}
 
 	}
